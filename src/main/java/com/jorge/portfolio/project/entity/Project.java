@@ -2,7 +2,6 @@ package com.jorge.portfolio.project.entity;
 
 import com.jorge.portfolio.member.entity.Member;
 import com.jorge.portfolio.project.enums.ProjectStatus;
-import com.jorge.portfolio.project.enums.RiskClassification;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,10 +13,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -28,30 +31,30 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 160)
     private String name;
 
-    @Column(length = 1000)
-    private String description;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 50)
-    private ProjectStatus status;
-
-    @Enumerated(EnumType.STRING)
-    @Column(length = 50)
-    private RiskClassification riskClassification;
-
+    @Column(nullable = false)
     private LocalDate startDate;
 
-    private LocalDate endDate;
+    @Column(nullable = false)
+    private LocalDate expectedEndDate;
 
-    @Column(precision = 19, scale = 2)
-    private BigDecimal budget;
+    private LocalDate actualEndDate;
+
+    @Column(nullable = false, precision = 15, scale = 2)
+    private BigDecimal totalBudget;
+
+    @Column(length = 2000)
+    private String description;
 
     @ManyToOne
-    @JoinColumn(name = "manager_id")
+    @JoinColumn(name = "manager_id", nullable = false)
     private Member manager;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 40)
+    private ProjectStatus status;
 
     @ManyToMany
     @JoinTable(
@@ -60,6 +63,51 @@ public class Project {
             inverseJoinColumns = @JoinColumn(name = "member_id")
     )
     private Set<Member> allocatedMembers = new HashSet<>();
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+    protected Project() {
+    }
+
+    public Project(
+            String name,
+            LocalDate startDate,
+            LocalDate expectedEndDate,
+            BigDecimal totalBudget,
+            Member manager,
+            ProjectStatus status
+    ) {
+        this.name = name;
+        this.startDate = startDate;
+        this.expectedEndDate = expectedEndDate;
+        this.totalBudget = totalBudget;
+        this.manager = manager;
+        this.status = status;
+    }
+
+    @PrePersist
+    void prePersist() {
+        LocalDateTime now = LocalDateTime.now();
+        createdAt = now;
+        updatedAt = now;
+    }
+
+    @PreUpdate
+    void preUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    public void addAllocatedMember(Member member) {
+        allocatedMembers.add(member);
+    }
+
+    public void removeAllocatedMember(Member member) {
+        allocatedMembers.remove(member);
+    }
 
     public Long getId() {
         return id;
@@ -77,30 +125,6 @@ public class Project {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public ProjectStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ProjectStatus status) {
-        this.status = status;
-    }
-
-    public RiskClassification getRiskClassification() {
-        return riskClassification;
-    }
-
-    public void setRiskClassification(RiskClassification riskClassification) {
-        this.riskClassification = riskClassification;
-    }
-
     public LocalDate getStartDate() {
         return startDate;
     }
@@ -109,20 +133,36 @@ public class Project {
         this.startDate = startDate;
     }
 
-    public LocalDate getEndDate() {
-        return endDate;
+    public LocalDate getExpectedEndDate() {
+        return expectedEndDate;
     }
 
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
+    public void setExpectedEndDate(LocalDate expectedEndDate) {
+        this.expectedEndDate = expectedEndDate;
     }
 
-    public BigDecimal getBudget() {
-        return budget;
+    public LocalDate getActualEndDate() {
+        return actualEndDate;
     }
 
-    public void setBudget(BigDecimal budget) {
-        this.budget = budget;
+    public void setActualEndDate(LocalDate actualEndDate) {
+        this.actualEndDate = actualEndDate;
+    }
+
+    public BigDecimal getTotalBudget() {
+        return totalBudget;
+    }
+
+    public void setTotalBudget(BigDecimal totalBudget) {
+        this.totalBudget = totalBudget;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Member getManager() {
@@ -133,11 +173,43 @@ public class Project {
         this.manager = manager;
     }
 
+    public ProjectStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ProjectStatus status) {
+        this.status = status;
+    }
+
     public Set<Member> getAllocatedMembers() {
         return allocatedMembers;
     }
 
     public void setAllocatedMembers(Set<Member> allocatedMembers) {
         this.allocatedMembers = allocatedMembers;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (!(object instanceof Project project)) {
+            return false;
+        }
+        return id != null && Objects.equals(id, project.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

@@ -1,20 +1,23 @@
 CREATE TABLE members (
     id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    assignment VARCHAR(50) NOT NULL
+    name VARCHAR(120) NOT NULL,
+    assignment VARCHAR(40) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE projects (
     id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    description VARCHAR(1000),
-    status VARCHAR(50) NOT NULL,
-    risk_classification VARCHAR(50),
-    start_date DATE,
-    end_date DATE,
-    budget NUMERIC(19, 2),
-    manager_id BIGINT,
+    name VARCHAR(160) NOT NULL,
+    start_date DATE NOT NULL,
+    expected_end_date DATE NOT NULL,
+    actual_end_date DATE NULL,
+    total_budget NUMERIC(15, 2) NOT NULL,
+    description VARCHAR(2000),
+    manager_id BIGINT NOT NULL,
+    status VARCHAR(40) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
     CONSTRAINT fk_projects_manager
         FOREIGN KEY (manager_id)
         REFERENCES members (id)
@@ -31,3 +34,8 @@ CREATE TABLE project_members (
         FOREIGN KEY (member_id)
         REFERENCES members (id)
 );
+
+CREATE INDEX idx_projects_status ON projects (status);
+CREATE INDEX idx_projects_manager_id ON projects (manager_id);
+CREATE INDEX idx_project_members_member_id ON project_members (member_id);
+CREATE INDEX idx_members_assignment ON members (assignment);

@@ -4,17 +4,13 @@ target/
 .idea/
 *.iml
 .vscode/
-
 .DS_Store
-
 *.log
-
 ### Java ###
 *.class
-
 ### Maven ###
 dependency-reduced-pom.xml
-
+.mvn/repository/
 ### JaCoCo ###
 jacoco.exec
 coverage/

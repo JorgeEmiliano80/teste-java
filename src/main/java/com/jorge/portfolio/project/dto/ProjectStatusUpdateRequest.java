@@ -1,4 +1,10 @@
 package com.jorge.portfolio.project.dto;
 
-public class ProjectStatusUpdateRequest {
+import com.jorge.portfolio.project.enums.ProjectStatus;
+import jakarta.validation.constraints.NotNull;
+
+public record ProjectStatusUpdateRequest(
+        @NotNull
+        ProjectStatus status
+) {
 }
