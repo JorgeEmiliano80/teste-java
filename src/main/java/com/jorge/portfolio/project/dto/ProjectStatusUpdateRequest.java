@@ -4,7 +4,7 @@ import com.jorge.portfolio.project.enums.ProjectStatus;
 import jakarta.validation.constraints.NotNull;
 
 public record ProjectStatusUpdateRequest(
-        @NotNull
+        @NotNull(message = "Status é obrigatório.")
         ProjectStatus status
 ) {
 }

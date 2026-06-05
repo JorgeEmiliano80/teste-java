@@ -8,26 +8,26 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record ProjectUpdateRequest(
-        @NotBlank
-        @Size(max = 160)
+        @NotBlank(message = "Nome do projeto é obrigatório.")
+        @Size(max = 160, message = "Nome do projeto deve ter no máximo 160 caracteres.")
         String name,
 
-        @NotNull
+        @NotNull(message = "Data de início é obrigatória.")
         LocalDate startDate,
 
-        @NotNull
+        @NotNull(message = "Previsão de término é obrigatória.")
         LocalDate expectedEndDate,
 
         LocalDate actualEndDate,
 
-        @NotNull
-        @DecimalMin("0.01")
+        @NotNull(message = "Orçamento total é obrigatório.")
+        @DecimalMin(value = "0.01", message = "Orçamento total deve ser maior ou igual a 0,01.")
         BigDecimal totalBudget,
 
-        @Size(max = 2000)
+        @Size(max = 2000, message = "Descrição deve ter no máximo 2000 caracteres.")
         String description,
 
-        @NotNull
+        @NotNull(message = "Gerente é obrigatório.")
         Long managerId
 ) {
 }

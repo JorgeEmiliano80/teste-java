@@ -234,14 +234,18 @@ public class ProjectService {
 
     private Specification<Project> buildSpecification(ProjectFilterRequest filter) {
         if (filter == null) {
-            return Specification.where(null);
+            return emptySpecification();
         }
 
-        return Specification.where(ProjectSpecification.hasName(filter.name()))
+        return ProjectSpecification.hasName(filter.name())
                 .and(ProjectSpecification.hasStatus(filter.status()))
                 .and(ProjectSpecification.hasManagerId(filter.managerId()))
                 .and(ProjectSpecification.startDateBetween(filter.startDateFrom(), filter.startDateTo()))
                 .and(ProjectSpecification.budgetBetween(filter.minBudget(), filter.maxBudget()));
+    }
+
+    private Specification<Project> emptySpecification() {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
     }
 
     private String normalizeText(String value) {
